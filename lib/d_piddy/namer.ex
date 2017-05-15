@@ -5,16 +5,11 @@ defmodule D.Piddy.Namer do
   # API #
   #######
 
-  defmacro autoname() do
-    quote do
-      name(__MODULE__)
-    end
-  end
-
-  @doc """
-  Generates `Registry` friendly pid names.
-  """
-  def name(val) do
-    {:via, Registry, {D.Piddy.Registry, {val, Process.group_leader()}}}
+  @doc false
+  def name(value) do
+    module = D.Piddy.Registry
+    pid    = Process.group_leader()
+    name   = {module, {value, pid}}
+    {:via, Registry, name}
   end
 end

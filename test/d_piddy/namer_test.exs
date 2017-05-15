@@ -1,23 +1,14 @@
 defmodule D.Piddy.NamerTest do
   use ExUnit.Case, async: true
 
-  describe "generating a Registry friendly name" do
-    test "automatically" do
-      import D.Piddy.Namer
+  test "pattern of name" do
+    alias D.Piddy.Namer
 
-      expected = {:via, Registry, {D.Piddy.Registry, {__MODULE__, Process.group_leader()}}}
-      actual = autoname()
-      assert expected == actual
-    end
+    module = D.Piddy.Registry
+    value  = "look ma, no hands"
+    pid    = Process.group_leader()
+    name   = {module, {value, pid}}
 
-    test "with a custom value" do
-      import D.Piddy.Namer
-
-      custom_val = "my custom val"
-
-      expected = {:via, Registry, {D.Piddy.Registry, {custom_val, Process.group_leader()}}}
-      actual = name(custom_val)
-      assert expected == actual
-    end
+    assert {:via, Registry, name} == Namer.name(value)
   end
 end
