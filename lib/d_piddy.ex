@@ -25,4 +25,23 @@ defmodule D.Piddy do
     alias D.Piddy.Namer
     Namer.name(val)
   end
+
+  @doc """
+  Finds a process in `D.Piddy.Registry` based on the value provided.  If the pid is not found, `nil` is returned
+
+  ## Example
+      iex> D.Piddy.lookup("<pid in registry>")
+      #PID<0.50.0>
+      iex> D.Piddy.lookup("<pid NOT in registry>")
+      nil
+  """
+  def lookup(value) do
+    registry     = D.Piddy.Registry
+    group_leader = Process.group_leader()
+
+    case Registry.lookup(registry, {value, group_leader}) do
+      [{pid, nil}] -> pid
+      []           -> nil
+    end
+  end
 end
