@@ -21,9 +21,11 @@ defmodule D.Piddy do
       iex> name("my pid name")
       {:via, Registry, {D.Piddy.Registry, {"my pid name", #PID<0.50.0>}}}
   """
-  def name(val) do
-    alias D.Piddy.Namer
-    Namer.name(val)
+  def name(value) do
+    module = D.Piddy.Registry
+    pid    = Process.group_leader()
+    name   = {module, {value, pid}}
+    {:via, Registry, name}
   end
 
   @doc """
