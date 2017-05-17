@@ -51,39 +51,47 @@ defmodule D.PiddyTest do
     end
   end
 
-  describe "looking up a process" do
-    defmodule MyServer do
+  describe "looking up an process that was autonamed" do
+    defmodule AutonamedServer do
       use GenServer
-      import D.Piddy
 
       def start_link() do
+        import D.Piddy, only: [autoname: 0]
         GenServer.start_link(__MODULE__, [], name: autoname())
       end
+    end
+
+    test "uses the module name" do
+      {:ok, pid} = AutonamedServer.start_link()
+      expected = pid
+      actual   = D.Piddy.lookup(AutonamedServer)
+      assert expected == actual
+    end
+  end
+
+  describe "looking up a process named with a value" do
+    defmodule NamedServer do
+      use GenServer
 
       def start_link(value) do
-        GenServer.start_link(__MODULE__, [], name: name(value))
+        GenServer.start_link(__MODULE__, [], name: D.Piddy.name(value))
       end
     end
 
-    test "that was autonamed uses the process' module name" do
-      {:ok, pid} = MyServer.start_link()
-      expected = pid
-      actual   = D.Piddy.lookup(MyServer)
-      assert expected == actual
-    end
-
-    test "that was name w/ with a value" do
+    test "by the value used in namimg the process" do
       value = "<insert creative value here>"
-      {:ok, pid} = MyServer.start_link(value)
+      {:ok, pid} = NamedServer.start_link(value)
       expected = pid
       actual   = D.Piddy.lookup(value)
       assert expected == actual
     end
 
-    test "that doesn't exist returns nil" do
-      unregistered_name = :this_is_not_the_pid_you_are_looking_for
-      expected = nil
-      actual   = D.Piddy.lookup(unregistered_name)
+    test "by calling GenServer directly" do
+      value = "<insert creative value here>"
+      name = D.Piddy.name(value)
+      {:ok, pid} = GenServer.start_link(NamedServer, [], name: name)
+      expected = pid
+      actual   = D.Piddy.lookup(value)
       assert expected == actual
     end
   end
