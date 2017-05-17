@@ -26,13 +26,27 @@ defmodule D.PiddyTest do
     end
   end
 
-  describe "generating a Registry friendly name" do
-    test "with a custom value" do
+  describe "generating a registry-friendly name by providing a value" do
+    test "uses the process group leader" do
       import D.Piddy
 
-      custom_val = "my custom val"
-      expected = {:via, Registry, {D.Piddy.Registry, {custom_val, Process.group_leader()}}}
-      actual = name(custom_val)
+      d_piddy_registry = D.Piddy.Registry
+
+      # if you generate a random name, rememeber it!
+      # you don't be able to find the pid without the name :)
+      any_ol_value = {
+        "this name is not very human readable",
+        make_ref(),
+        :crypto.strong_rand_bytes(10),
+        :i_am_a_potato
+      }
+
+      d_piddy_registry_key = {any_ol_value, Process.group_leader()}
+
+      registry_key = {d_piddy_registry, d_piddy_registry_key}
+
+      expected = {:via, Registry, registry_key}
+      actual = name(any_ol_value)
       assert expected == actual
     end
   end
