@@ -1,15 +1,19 @@
 defmodule D.PiddyTest do
   use ExUnit.Case, async: true
 
-  describe "generating a Registry friendly name" do
-    test "automatically" do
-      import D.Piddy
+  @module D.Piddy
 
-      expected = name(__MODULE__)
-      actual = autoname()
+  describe "autogenerating a registry-friendly pid name" do
+    test "calls 'name/1' w/ module name" do
+      require @module
+
+      expected = @module.name(__MODULE__)
+      actual = @module.autoname()
       assert expected == actual
     end
+  end
 
+  describe "generating a Registry friendly name" do
     test "with a custom value" do
       import D.Piddy
 

@@ -8,7 +8,7 @@ defmodule D.Piddy do
   """
   defmacro autoname() do
     quote do
-      name(__MODULE__)
+      unquote(__MODULE__).name(__MODULE__)
     end
   end
 
