@@ -8,7 +8,12 @@ defmodule D.Piddy do
   """
   defmacro autoname() do
     quote do
-      unquote(__MODULE__).name(__MODULE__)
+      case __MODULE__ do
+        module when not is_nil(module) ->
+          unquote(__MODULE__).name(module)
+        nil ->
+          raise ArgumentError, "cannot invoke autoname/0 outside module"
+      end
     end
   end
 

@@ -11,6 +11,19 @@ defmodule D.PiddyTest do
       actual = @module.autoname()
       assert expected == actual
     end
+
+    test "raises an error when called outside of a module" do
+      module = ArgumentError
+      pattern = ~r/cannot invoke autoname\/0 outside module/
+      function = fn ->
+        Code.compile_string("""
+          require #{inspect(@module)};
+          #{inspect(@module)}.autoname
+        """)
+      end
+
+      assert_raise(module, pattern, function)
+    end
   end
 
   describe "generating a Registry friendly name" do
